@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+    <!-- metadata, make sure 'package' is at least 3 segments (ie. com.mycompany.myproject) -->
+    <meta title="Nape Test" package="com.drkibitz.test.napetest" version="1.0.0" company="Dr. Kibitz" />
+
+    <!-- output -->
+    <app file="NapeTest" main="Main" path="Export" />
+
+    <window fps="60" background="#333333" />
+    <window width="0" height="0" if="html5" />
+
+    <!-- classpath, haxe libs -->
+    <source path="Source" />
+    <haxelib name="openfl" />
+    <haxelib name="nape" />
+
+    <!-- assets -->
+    <assets path="Assets" rename="assets" exclude="*.svg" />
+    <icon path="Assets/icon.svg" />
+
+    <!-- optimize output -->
+    <haxeflag name="-dce std" />
+
+    <haxedef name="NAPE_RELEASE_BUILD"/>
+    <haxedef name="NAPE_NO_INLINE" if="neko" />
+
+    <!--
+    <haxedef name="BasicSimulation" />
+    <haxedef name="BodyFromGraphic" />
+    <haxedef name="Constraints" />
+    <haxedef name="DestructibleTerrain" />
+    <haxedef name="FilteringInteractions" />
+    <haxedef name="FixedDragging" />
+    <haxedef name="MarioGalaxyGravity" />
+    <haxedef name="OneWayPlatforms" />
+    <haxedef name="PerlinSquares" />
+    <haxedef name="Portals" />
+    <haxedef name="Preloader" />
+    <haxedef name="PyramidStressTest" />
+    <haxedef name="SoftBodies" />
+    <haxedef name="SpatialQueries" />
+    <haxedef name="Viewports" />
+    -->
+
+</project>
