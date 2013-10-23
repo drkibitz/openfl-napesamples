@@ -25,6 +25,7 @@ typedef BasicTemplateParams = {
 
 class BasicTemplate extends Sprite implements ISample
 {
+    public static var baseMemory:Float;
     public static var title:String;
 
     /** Implement ISample */

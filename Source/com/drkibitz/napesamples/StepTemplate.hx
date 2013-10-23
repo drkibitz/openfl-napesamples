@@ -15,7 +15,6 @@ typedef StepTemplateParams = {> BasicTemplateParams,
 
 class StepTemplate extends BasicTemplate
 {
-    private var baseMemory:Float;
     private var prevTime:Int;
     private var smoothFps:Float = -1;
 
@@ -38,7 +37,6 @@ class StepTemplate extends BasicTemplate
 
     override private function didAddToStage():Void
     {
-        baseMemory = System.totalMemory;
         prevTime = Lib.getTimer();
         addEventListener(Event.ENTER_FRAME, this_onEnterFrame);
     }
@@ -58,19 +56,19 @@ class StepTemplate extends BasicTemplate
 
         var fps = (1000 / deltaTime);
         smoothFps = (smoothFps == -1 ? fps : (smoothFps * 0.97) + (fps * 0.03));
-        var text = "fps: " + ((""+smoothFps).substr(0, 5)) + "\n";
-        #if html5
-        text += "mem: n/a";
-        #else
-        text += "mem: " + ((""+(System.totalMemory - baseMemory) / (1024 * 1024)).substr(0, 5)) + "Mb";
+        var text = "\nfps: " + ((""+smoothFps).substr(0, 5));
+
+        // FIXME: There is a memory leak somewhere.
+        // html5 can't implement a working version of this anyway.
+        #if !html5
+        text += "\nmem: " + ((""+(System.totalMemory - BasicTemplate.baseMemory) / (1024 * 1024)).substr(0, 5)) + "Mb";
         #end
 
         if (space != null) {
-            text += "\n"+
-                    "velocity-iterations: " + params.velIterations + "\n" +
-                    "position-iterations: " + params.posIterations + "\n";
+            text += "\nvelocity-iterations: " + params.velIterations +
+                    "\nposition-iterations: " + params.posIterations;
         }
-        textField.text = "title: " + BasicTemplate.title + "\n" + text;
+        textField.text = "title: " + BasicTemplate.title + text;
 
         var noStepsNeeded = false;
 

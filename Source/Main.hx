@@ -9,6 +9,7 @@ import com.napephys.samples.*;
 import flash.display.Sprite;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.system.System;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
@@ -28,6 +29,8 @@ class Main extends Sprite
     public function new()
     {
         super();
+
+        BasicTemplate.baseMemory = System.totalMemory;
 
         sampleDefs = [
             {

@@ -13,17 +13,18 @@ This project combines all samples into one application. Build with `openfl test`
 ## Controls
 - Change samples with the arrow keys
 - Reset current sample with the "r" key
-- Use the mouse to drag objects in most samples
-- *TODO: Mobile screen controls (Just tap to change for now, dragging still works on objects)*
+- Use the mouse to interact with objects in most samples
+- *TODO: Mobile screen controls (Just tap to change for now, object interaction still works)*
 
 ## Issues
 
-There are issues that cause the need for many target specific conditions. The biggest issues are in regard to the samples of **BodyFromGraphic** and **DestructibleTerrain**. The sample **BodyFromGraphic** does work on non-flash targets, but requires some work-arounds, and does not appear visually identical across targets due to graphic fills in NME. The following listed issues prevent the sample **DestructibleTerrain** from running correctly in all targets except flash.
+There are issues that cause the need for many target specific conditions. The biggest issues are in regard to the samples of **BodyFromGraphic** and **DestructibleTerrain**. Both samples work on most non-flash targets, but require some work-arounds, and may not appear visually identical across targets (native). Both samples do not work on the HTML5 target because the samples are using certain OpenFL/NME APIs that have issues in their HTML5 implemtations.
 
-Other samples may be prevented or are slightly modified for performance reasons on the HTML5 and Neko targets.
+Some samples may be disabled or are slightly modified for performance reasons on the HTML5 and Neko targets.
 
 ### Known issues
 
+- There are some leaks in samples where they don't fully clean up after themselves (hopefully just the samples)
 - OpenFL implementation of overlapping graphic fill does not punch previous fill
 - OpenFL implementation of BitmapData.perlinNoise does not work
 - OpenFL implementation of BitmapData.draw does not use BlendMode
