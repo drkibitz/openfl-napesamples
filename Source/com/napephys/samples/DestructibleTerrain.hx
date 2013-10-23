@@ -1,18 +1,15 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Destructible Terrain
- * Author: Luca Deltodesco
- *
- * Yet another sample featuring MarchingSquares,
- * this time used to implement destructible terrain with
- * use of a Bitmap for controlling removal from terrain.
- *
- * Terrain is chunked so that only necessary regions are
- * recomputed enabling higher performance.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import flash.display.BitmapData;
+import flash.display.BitmapDataChannel;
+import flash.display.BlendMode;
+import flash.display.Sprite;
+import flash.geom.Matrix;
 
 import nape.geom.AABB;
 import nape.geom.GeomPoly;
@@ -26,19 +23,27 @@ import nape.shape.Circle;
 import nape.shape.Polygon;
 import nape.space.Space;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+import openfl.Assets;
 
-import flash.display.BitmapData;
-import flash.display.BitmapDataChannel;
-import flash.display.BlendMode;
-import flash.display.Sprite;
-import flash.geom.Matrix;
+/**
+ * Sample: Destructible Terrain
+ * Author: Luca Deltodesco
+ *
+ * Yet another sample featuring MarchingSquares,
+ * this time used to implement destructible terrain with
+ * use of a Bitmap for controlling removal from terrain.
+ *
+ * Terrain is chunked so that only necessary regions are
+ * recomputed enabling higher performance.
+ */
 
-class DestructibleTerrain extends Template {
-    function new() {
+class DestructibleTerrain extends HandTemplate
+{
+    private var terrain:Terrain;
+    private var bomb:Sprite;
+
+    public function new()
+    {
         super({
             gravity: Vec2.get(0, 600),
             staticClick: explosion,
@@ -46,16 +51,15 @@ class DestructibleTerrain extends Template {
         });
     }
 
-    var terrain:Terrain;
-    var bomb:Sprite;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
         createBorder();
 
         // Initialise terrain bitmap.
+        // OpenFL's perlinNoise implementation doesn't work
         var bit = new BitmapData(w, h, true, 0);
         bit.perlinNoise(200, 200, 2, 0x3ed, false, true, BitmapDataChannel.ALPHA, false);
 
@@ -69,8 +73,10 @@ class DestructibleTerrain extends Template {
         bomb.graphics.drawCircle(0, 0, 40);
     }
 
-    function explosion(pos:Vec2) {
+    private function explosion(pos:Vec2):Void
+    {
         // Erase bomb graphic out of terrain.
+        // OpenFL's implementation does not do anything with BlenMode
         terrain.bitmap.draw(bomb, new Matrix(1, 0, 0, 1, pos.x, pos.y), null, BlendMode.ERASE);
 
         // Invalidate region of terrain effected.
@@ -80,7 +86,8 @@ class DestructibleTerrain extends Template {
         terrain.invalidate(region, space);
     }
 
-    function createObject(pos:Vec2) {
+    private function createObject(pos:Vec2):Void
+    {
         var body = new Body(BodyType.DYNAMIC, pos);
         if (Math.random() < 0.333) {
             body.shapes.add(new Circle(10 + Math.random()*20));
@@ -94,27 +101,26 @@ class DestructibleTerrain extends Template {
         }
         body.space = space;
     }
-
-    static function main() {
-        flash.Lib.current.addChild(new DestructibleTerrain());
-    }
 }
 
-class Terrain implements IsoFunction {
+class Terrain#if flash implements IsoFunction#end
+{
     public var bitmap:BitmapData;
 
-    var cellSize:Float;
-    var subSize:Float;
+    private var cellSize:Float;
+    private var subSize:Float;
 
-    var width:Int;
-    var height:Int;
-    var cells:Array<Body>;
+    private var width:Int;
+    private var height:Int;
+    private var cells:Array<Body>;
 
-    var isoBounds:AABB;
+    private var isoBounds:AABB;
+
     public var isoGranularity:Vec2;
     public var isoQuality:Int = 8;
 
-    public function new(bitmap:BitmapData, cellSize:Float, subSize:Float) {
+    public function new(bitmap:BitmapData, cellSize:Float, subSize:Float)
+    {
         this.bitmap = bitmap;
         this.cellSize = cellSize;
         this.subSize = subSize;
@@ -128,7 +134,8 @@ class Terrain implements IsoFunction {
         isoGranularity = Vec2.get(subSize, subSize);
     }
 
-    public function invalidate(region:AABB, space:Space) {
+    public function invalidate(region:AABB, space:Space):Void
+    {
         // compute effected cells.
         var x0 = Std.int(region.min.x/cellSize); if(x0<0) x0 = 0;
         var y0 = Std.int(region.min.y/cellSize); if(y0<0) y0 = 0;
@@ -147,7 +154,11 @@ class Terrain implements IsoFunction {
             isoBounds.x = x*cellSize;
             isoBounds.y = y*cellSize;
             var polys = MarchingSquares.run(
+                #if flash
                 this,
+                #else
+                iso,
+                #end
                 isoBounds,
                 isoGranularity,
                 isoQuality
@@ -183,7 +194,8 @@ class Terrain implements IsoFunction {
 
     //iso-function for terrain, computed as a linearly-interpolated
     //alpha threshold from bitmap.
-    public function iso(x:Float,y:Float):Float {
+    public function iso(x:Float, y:Float):Float
+    {
         var ix = Std.int(x); if(ix<0) ix = 0; else if(ix>=bitmap.width)  ix = bitmap.width -1;
         var iy = Std.int(y); if(iy<0) iy = 0; else if(iy>=bitmap.height) iy = bitmap.height-1;
         var fx = x - ix; if(fx<0) fx = 0; else if(fx>1) fx = 1;

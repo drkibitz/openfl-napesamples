@@ -1,21 +1,12 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Fixed Dragging
- * Author: Luca Deltodesco
- *
- * Demonstrating how one might perform a Nape simulation
- * that uses a fixed-time step for better reproducibility.
- * Also demonstrate how to use a PivotJoint for dragging
- * of Nape physics objects.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.BasicTemplate;
 
 import flash.Lib;
-import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 
 import nape.constraint.PivotJoint;
@@ -24,61 +15,49 @@ import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.shape.Circle;
 import nape.shape.Polygon;
-import nape.space.Space;
-import nape.util.BitmapDebug;
-import nape.util.Debug;
 
-class FixedDragging extends Sprite {
+/**
+ * Sample: Fixed Dragging
+ * Author: Luca Deltodesco
+ *
+ * Demonstrating how one might perform a Nape simulation
+ * that uses a fixed-time step for better reproducibility.
+ * Also demonstrate how to use a PivotJoint for dragging
+ * of Nape physics objects.
+ */
 
-    var space:Space;
-    var debug:Debug;
-    var handJoint:PivotJoint;
+class FixedDragging extends BasicTemplate
+{
+    private var handJoint:PivotJoint;
+    private var prevTimeMS:Int;
+    private var simulationTime:Float;
 
-    var prevTimeMS:Int;
-    var simulationTime:Float;
-
-    function new() {
-        super();
-
-        if (stage != null) {
-            initialise(null);
-        }
-        else {
-            addEventListener(Event.ADDED_TO_STAGE, initialise);
-        }
+    public function new()
+    {
+        super({});
     }
 
-    function initialise(ev:Event):Void {
-        if (ev != null) {
-            removeEventListener(Event.ADDED_TO_STAGE, initialise);
-        }
-
-        // Create a new simulation Space.
-        //
-        //   Default gravity is (0, 0)
-        space = new Space();
-
-        // Create a new BitmapDebug screen matching stage dimensions and
-        // background colour.
-        //
-        //   The Debug object itself is not a DisplayObject, we add its
-        //   display property to the display list.
-        //
-        //   We additionally set the flag enabling drawing of constraints
-        //   when rendering a Space object to true.
-        debug = new BitmapDebug(stage.stageWidth, stage.stageHeight, stage.color);
-        addChild(debug.display);
-        debug.drawConstraints = true;
-
-        setUp();
-
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+    override private function didAddToStage():Void
+    {
         stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
         stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-        stage.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+        addEventListener(Event.ENTER_FRAME, enterFrameHandler);
     }
 
-    function setUp():Void {
+    override private function willRemoveFromStage():Void
+    {
+        if (handJoint != null) {
+            handJoint.active = false;
+            handJoint.space = null;
+            handJoint = null;
+        }
+        stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+        stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+        removeEventListener(Event.ENTER_FRAME, enterFrameHandler);
+    }
+
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -144,7 +123,8 @@ class FixedDragging extends Sprite {
         simulationTime = 0.0;
     }
 
-    function enterFrameHandler(ev:Event):Void {
+    private function enterFrameHandler(ev:Event):Void
+    {
 
         var curTimeMS = Lib.getTimer();
         if (curTimeMS == prevTimeMS) {
@@ -184,7 +164,8 @@ class FixedDragging extends Sprite {
         debug.flush();
     }
 
-    function mouseDownHandler(ev:MouseEvent):Void {
+    private function mouseDownHandler(ev:MouseEvent):Void
+    {
         // Allocate a Vec2 from object pool.
         var mousePoint = Vec2.get(mouseX, mouseY);
 
@@ -215,23 +196,9 @@ class FixedDragging extends Sprite {
         mousePoint.dispose();
     }
 
-    function mouseUpHandler(ev:MouseEvent):Void {
+    private function mouseUpHandler(ev:MouseEvent):Void
+    {
         // Disable hand joint (if not already disabled).
         handJoint.active = false;
     }
-
-    function keyDownHandler(ev:KeyboardEvent):Void {
-        if (ev.keyCode == 82) { // 'R'
-            // space.clear() removes all bodies and constraints from
-            // the Space.
-            space.clear();
-
-            setUp();
-        }
-    }
-
-    static function main() {
-        Lib.current.addChild(new FixedDragging());
-    }
 }
-

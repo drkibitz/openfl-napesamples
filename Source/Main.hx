@@ -25,7 +25,8 @@ class Main extends Sprite
             BodyFromGraphic,
             #end
             Constraints,
-            #if !html5
+            // perlineNouse and draw blendMode is not implemented in OpenFL
+            #if flash
             DestructibleTerrain,
             #end
             FilteringInteractions,
@@ -35,13 +36,14 @@ class Main extends Sprite
             PerlinSquares,
             Portals,
             PyramidStressTest,
-            #if cpp
+            #if (cpp||flash)
             SoftBodies,
             #end
             SpatialQueries,
             Viewports
         ];
 
+        // TODO: Implement an on-screen controller
         #if mobile
         stage.addEventListener(MouseEvent.CLICK, function (e:MouseEvent) {
             var index = currentSampleIndex;
@@ -74,9 +76,10 @@ class Main extends Sprite
     private function stage_onKeyUp(event:KeyboardEvent):Void
     {
         var index = currentSampleIndex;
+        var code:Int = event.keyCode;
 
         // top, left
-        switch (event.keyCode) {
+        switch (code) {
         case 38, 37:
             index = (index == 0) ? sampleClasses.length - 1 : index - 1;
         // right, bottom

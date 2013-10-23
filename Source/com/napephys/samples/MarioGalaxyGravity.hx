@@ -1,17 +1,9 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Mario Galaxy Gravity
- * Author: Luca Deltodesco
- *
- * Demonstrating applying impulses to Bodies
- * and use of the distance methods available through the
- * Geom object.
- *
- * Also demonstrates the use of MarchingSquares, convex
- * decompositions and polygon simplification.
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
 
 import nape.geom.AABB;
 import nape.geom.Geom;
@@ -25,22 +17,32 @@ import nape.shape.Circle;
 import nape.shape.Polygon;
 import nape.space.Broadphase;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: Mario Galaxy Gravity
+ * Author: Luca Deltodesco
+ *
+ * Demonstrating applying impulses to Bodies
+ * and use of the distance methods available through the
+ * Geom object.
+ *
+ * Also demonstrates the use of MarchingSquares, convex
+ * decompositions and polygon simplification.
+ */
 
-class MarioGalaxyGravity extends Template {
-    function new() {
+class MarioGalaxyGravity extends HandTemplate
+{
+    private var planetaryBodies:Array<Body>;
+    private var samplePoint:Body;
+
+    public function new()
+    {
         super({
             generator: generateObject
         });
     }
 
-    var planetaryBodies:Array<Body>;
-    var samplePoint:Body;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -63,7 +65,11 @@ class MarioGalaxyGravity extends Template {
         // Create the central planet.
         var planet = new Body(BodyType.STATIC);
         var polys = MarchingSquares.run(
+            #if flash
             new StarIso(),
+            #else
+            new StarIso().iso,
+            #end
             new AABB(0, 0, w, h),
             new Vec2(5, 5)
         );
@@ -132,13 +138,15 @@ class MarioGalaxyGravity extends Template {
         }
     }
 
-    override function preStep(deltaTime:Float) {
+    override private function preStep(deltaTime:Float):Void
+    {
         for (planet in planetaryBodies) {
             planetaryGravity(planet, deltaTime);
         }
     }
 
-    function planetaryGravity(planet:Body, deltaTime:Float) {
+    private function planetaryGravity(planet:Body, deltaTime:Float)
+    {
         // Apply a gravitational impulse to all bodies
         // pulling them to the closest point of a planetary body.
         //
@@ -180,7 +188,8 @@ class MarioGalaxyGravity extends Template {
         closestB.dispose();
     }
 
-    function generateObject(pos:Vec2) {
+    private function generateObject(pos:Vec2):Void
+    {
         var body = new Body();
         body.position = pos;
 
@@ -197,13 +206,10 @@ class MarioGalaxyGravity extends Template {
 
         body.space = space;
     }
-
-    static function main() {
-        flash.Lib.current.addChild(new MarioGalaxyGravity());
-    }
 }
 
-class StarIso implements IsoFunction {
+class StarIso#if flash implements IsoFunction#end
+{
     public function new() {}
     public function iso(x:Float, y:Float) {
         x -= 400;

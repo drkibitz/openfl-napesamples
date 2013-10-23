@@ -1,17 +1,9 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Portals
- * Author: Luca Deltodesco
- *
- * Complex sample making use of the UserConstraint API
- * to implement a dynamic Portal constraint to link
- * a body, with a clone that is produced incrementally
- * as it passes through a sensor portal handled via the
- * Nape callbacks system.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
 
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
@@ -37,21 +29,30 @@ import nape.space.Space;
 import nape.util.Debug;
 import nape.TArray;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: Portals
+ * Author: Luca Deltodesco
+ *
+ * Complex sample making use of the UserConstraint API
+ * to implement a dynamic Portal constraint to link
+ * a body, with a clone that is produced incrementally
+ * as it passes through a sensor portal handled via the
+ * Nape callbacks system.
+ */
 
-class Portals extends Template {
-    function new() {
+class Portals extends HandTemplate
+{
+    private var manager:PortalManager;
+
+    public function new()
+    {
         super({
             gravity : Vec2.get(0, 600)
         });
     }
 
-    var manager:PortalManager;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -123,7 +124,8 @@ class Portals extends Template {
         }}
     }
 
-    function genPortal(width:Float, position:Vec2 = null, rotation:Float = 0.0, body:Body):Portal {
+    private function genPortal(width:Float, position:Vec2 = null, rotation:Float = 0.0, body:Body):Portal
+    {
         if (body == null) body = new Body();
         var sides = [new Polygon(Polygon.rect(-10, -width/2, 20, -10)),
                      new Polygon(Polygon.rect(-10,  width/2, 20,  10))];
@@ -167,10 +169,6 @@ class Portals extends Template {
         sensorData.__portal = portal;
 
         return portal;
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new Portals());
     }
 }
 

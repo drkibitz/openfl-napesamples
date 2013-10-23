@@ -1,69 +1,47 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Basic Simulation
- * Author: Luca Deltodesco
- *
- * In this sample, I show how to construct the most basic of Nape
- * simulations, together with a debug display.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.BasicTemplate;
 
-import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.KeyboardEvent;
 
 import nape.geom.Vec2;
 import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.shape.Circle;
 import nape.shape.Polygon;
-import nape.space.Space;
-import nape.util.BitmapDebug;
-import nape.util.Debug;
 
-class BasicSimulation extends Sprite {
+/**
+ * Sample: Basic Simulation
+ * Author: Luca Deltodesco
+ *
+ * In this sample, I show how to construct the most basic of Nape
+ * simulations, together with a debug display.
+ */
 
-    var space:Space;
-    var debug:Debug;
-
-    function new() {
-        super();
-
-        if (stage != null) {
-            initialise(null);
-        }
-        else {
-            addEventListener(Event.ADDED_TO_STAGE, initialise);
-        }
+class BasicSimulation extends BasicTemplate
+{
+    public function new()
+    {
+        super({
+            gravity: Vec2.weak(0, 600)
+        });
     }
 
-    function initialise(ev:Event):Void {
-        if (ev != null) {
-            removeEventListener(Event.ADDED_TO_STAGE, initialise);
-        }
-
-        // Create a new simulation Space.
-        //   Weak Vec2 will be automatically sent to object pool.
-        //   when used as argument to Space constructor.
-        var gravity = Vec2.weak(0, 600);
-        space = new Space(gravity);
-
-        // Create a new BitmapDebug screen matching stage dimensions and
-        // background colour.
-        //   The Debug object itself is not a DisplayObject, we add its
-        //   display property to the display list.
-        debug = new BitmapDebug(stage.stageWidth, stage.stageHeight, stage.color);
-        addChild(debug.display);
-
-        setUp();
-
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
-        stage.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+    override private function didAddToStage():Void
+    {
+        stage.addEventListener(Event.ENTER_FRAME, this_onEnterFrame);
     }
 
-    function setUp() {
+    override private function willRemoveFromStage():Void
+    {
+        stage.removeEventListener(Event.ENTER_FRAME, this_onEnterFrame);
+    }
+
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -121,7 +99,8 @@ class BasicSimulation extends Sprite {
         //    space.bodies.add(body);
     }
 
-    function enterFrameHandler(ev:Event):Void {
+    private function this_onEnterFrame(event:Event):Void
+    {
         // Step forward in simulation by the required number of seconds.
         space.step(1 / stage.frameRate);
 
@@ -132,19 +111,5 @@ class BasicSimulation extends Sprite {
         debug.clear();
         debug.draw(space);
         debug.flush();
-    }
-
-    function keyDownHandler(ev:KeyboardEvent):Void {
-        if (ev.keyCode == 82) { // 'R'
-            // space.clear() removes all bodies (and constraints of
-            // which we have none) from the space.
-            space.clear();
-
-            setUp();
-        }
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new BasicSimulation());
     }
 }

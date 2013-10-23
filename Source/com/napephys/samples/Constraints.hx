@@ -1,18 +1,13 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Constraints
- * Author: Luca Deltodesco
- *
- * Simple demonstrations of all the in-built Nape constraints.
- * All of these constraints can be used in complement to
- * produce more complex behaviours.
- *
- * What is not demonstrated in this sample, is the use of the
- * UserConstraint API, and of the nape-symbolic module.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 
 import nape.constraint.AngleJoint;
 import nape.constraint.Constraint;
@@ -28,22 +23,19 @@ import nape.phys.BodyType;
 import nape.shape.Circle;
 import nape.shape.Polygon;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: Constraints
+ * Author: Luca Deltodesco
+ *
+ * Simple demonstrations of all the in-built Nape constraints.
+ * All of these constraints can be used in complement to
+ * produce more complex behaviours.
+ *
+ * What is not demonstrated in this sample, is the use of the
+ * UserConstraint API, and of the nape-symbolic module.
+ */
 
-import flash.text.TextField;
-import flash.text.TextFormat;
-import flash.text.TextFormatAlign;
-
-class Constraints extends Template {
-    function new() {
-        super({
-            gravity: Vec2.get(0, 600),
-            noReset: true
-        });
-    }
+class Constraints extends HandTemplate {
 
     // Cell sizes
     static inline var cellWcnt = 3;
@@ -52,7 +44,16 @@ class Constraints extends Template {
     static inline var cellHeight = 600 / cellHcnt;
     static inline var size = 22;
 
-    override function init() {
+    public function new()
+    {
+        super({
+            gravity: Vec2.get(0, 600),
+            noReset: true
+        });
+    }
+
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -183,13 +184,17 @@ class Constraints extends Template {
         // Description text
         withCell(0, 0, "", function (x, y) {
             var txt = new TextField();
-            var tf = new TextFormat(null,14,0xffffff);
+            var tf = new TextFormat("Verdana", 12, 0xffffff);
             tf.align = TextFormatAlign.CENTER;
             txt.defaultTextFormat = tf;
             txt.text = "Constraints softened with\nfrequency="+frequency+"\ndamping="+damping;
+            #if !html5
             var metrics = txt.getLineMetrics(0);
+            txt.y = y((cellHeight - metrics.height * 3) / 2);
+            #else
+            txt.y = y(cellHeight / 2);
+            #end
             txt.x = x(0);
-            txt.y = y((cellHeight - metrics.height*3)/2);
             txt.width = cellWidth;
             txt.height = cellHeight;
             txt.selectable = false;
@@ -198,13 +203,13 @@ class Constraints extends Template {
     }
 
     // Environment for each cell.
-    function withCell(i:Int, j:Int, title:String, f:(Float->Float)->(Float->Float)->Void) {
+    private function withCell(i:Int, j:Int, title:String, f:(Float->Float)->(Float->Float)->Void):Void
+    {
         var txt = new TextField();
-        var tf = new TextFormat(null,16,0xffffff);
+        var tf = new TextFormat("Verdana", 12, 0xffffff);
         tf.align = TextFormatAlign.CENTER;
         txt.defaultTextFormat = tf;
         txt.text = title;
-        var metrics = txt.getLineMetrics(0);
         txt.x = i * cellWidth;
         txt.y = j * cellHeight;
         txt.width = cellWidth;
@@ -217,7 +222,8 @@ class Constraints extends Template {
     }
 
     // Box utility.
-    function box(x:Float, y:Float, radius:Float, pinned:Bool=false) {
+    private function box(x:Float, y:Float, radius:Float, pinned:Bool=false):Body
+    {
         var body = new Body();
         body.position.setxy(x, y);
         body.shapes.add(new Polygon(Polygon.box(radius*2, radius*2)));
@@ -227,9 +233,5 @@ class Constraints extends Template {
             pin.space = space;
         }
         return body;
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new Constraints());
     }
 }

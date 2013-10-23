@@ -1,7 +1,22 @@
 package com.napephys.samples;
 
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import nape.dynamics.InteractionFilter;
+import nape.geom.AABB;
+import nape.geom.Ray;
+import nape.geom.Vec2;
+import nape.phys.Body;
+import nape.phys.BodyList;
+import nape.phys.BodyType;
+import nape.shape.Circle;
+import nape.shape.Polygon;
+import nape.shape.Shape;
+
 /**
- *
  * Sample: Spatial Queries
  * Author: Luca Deltodesco
  *
@@ -21,50 +36,37 @@ package com.napephys.samples;
  * etc.
  */
 
-import nape.dynamics.InteractionFilter;
-import nape.geom.AABB;
-import nape.geom.Ray;
-import nape.geom.Vec2;
-import nape.phys.Body;
-import nape.phys.BodyList;
-import nape.phys.BodyType;
-import nape.shape.Circle;
-import nape.shape.Polygon;
-import nape.shape.Shape;
+class SpatialQueries extends HandTemplate
+{
+    // cannonball we use in convex queries.
+    private var cannonBall:Body;
+    private var cannonBallShape:Shape;
+    private var cannon:Body;
+    private var cannonGunFilter:InteractionFilter;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+    // gun reference to seed ray shots
+    private var gun:Body;
+    private var ray:Ray;
 
-class SpatialQueries extends Template {
-    function new() {
+    // Body-list for re-use in sample methods.
+    private var output:BodyList;
+
+    // AABB used for sampling
+    private var sampleAABB:AABB;
+
+    // Shape and its Body used for sample
+    private var sampleBody:Body;
+    private var sampleShape:Shape;
+
+    public function new()
+    {
         super({
             gravity: Vec2.get(0, 0)
         });
     }
 
-    // cannonball we use in convex queries.
-    var cannonBall:Body;
-    var cannonBallShape:Shape;
-    var cannon:Body;
-    var cannonGunFilter:InteractionFilter;
-
-    // gun reference to seed ray shots
-    var gun:Body;
-    var ray:Ray;
-
-    // Body-list for re-use in sample methods.
-    var output:BodyList;
-
-    // AABB used for sampling
-    var sampleAABB:AABB;
-
-    // Shape and its Body used for sample
-    var sampleBody:Body;
-    var sampleShape:Shape;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -133,8 +135,8 @@ class SpatialQueries extends Template {
         }
     }
 
-    override function postUpdate(_:Float) {
-
+    override private function postUpdate(deltaTime:Float):Void
+    {
         // Shoot cannon through Space to look for collision.
         // we use the convexCast for this which uses a Shape
         // to define the colliding entity, and a Body's position and velocities
@@ -299,9 +301,5 @@ class SpatialQueries extends Template {
             debug.drawFilledCircle(b.position, 4, 0xffff00);
         }
         output.clear();
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new SpatialQueries());
     }
 }

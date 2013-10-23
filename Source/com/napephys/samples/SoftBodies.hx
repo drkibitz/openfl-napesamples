@@ -1,7 +1,22 @@
 package com.napephys.samples;
 
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import flash.display.Sprite;
+
+import nape.constraint.PivotJoint;
+import nape.geom.GeomPoly;
+import nape.geom.Vec2;
+import nape.phys.Body;
+import nape.phys.BodyType;
+import nape.phys.Compound;
+import nape.shape.Edge;
+import nape.shape.Polygon;
+
 /**
- *
  * Sample: Soft Bodies
  * Author: Luca Deltodesco
  *
@@ -21,31 +36,16 @@ package com.napephys.samples;
  *
  * Even though this is an expensive method with LOTS of Bodies
  * and Constraints, it is still highly performant!
- *
  */
-
-import nape.constraint.MotorJoint;
-import nape.constraint.PivotJoint;
-import nape.geom.GeomPoly;
-import nape.geom.Vec2;
-import nape.phys.Body;
-import nape.phys.BodyType;
-import nape.phys.Compound;
-import nape.shape.Circle;
-import nape.shape.Edge;
-import nape.shape.Polygon;
-
-import flash.display.Sprite;
-
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
 
 typedef SoftBody = Compound;
 
-class SoftBodies extends Template {
-    function new() {
+class SoftBodies extends HandTemplate
+{
+    private var softBodies:Array<SoftBody>;
+
+    public function new()
+    {
         super({
             gravity: Vec2.get(0, 600),
 
@@ -56,9 +56,8 @@ class SoftBodies extends Template {
         });
     }
 
-    var softBodies:Array<SoftBody>;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -113,7 +112,8 @@ class SoftBodies extends Template {
         }}
     }
 
-    override function preStep(deltaTime:Float) {
+    override private function preStep(deltaTime:Float):Void
+    {
         // Iterate over the soft bodies, computing a pressure force
         // and applying this force to each edge of the soft body.
         for (s in softBodies) {
@@ -133,12 +133,13 @@ class SoftBodies extends Template {
         }
     }
 
-    function polygonalBody(
+    private function polygonalBody(
         position:Vec2,
         thickness:Float, discretisation:Float,
         frequency:Float, damping:Float,
         poly:GeomPoly
-    ) {
+    ):SoftBody
+    {
         // We're going to collect all Bodies and Constraints into a SoftBody
         // for ease of use hereafter.
         var body = new SoftBody();
@@ -254,8 +255,10 @@ class SoftBodies extends Template {
         return body;
     }
 
-    static var areaPoly = new GeomPoly();
-    static function polygonalArea(s:SoftBody) {
+    static private var areaPoly = new GeomPoly();
+
+    static private function polygonalArea(s:SoftBody):Float
+    {
         // Computing the area of the soft body, we use the vertices of its edges
         // to populate a GeomPoly and use its area function.
         var refEdges:Array<Edge> = s.userData.refEdges;
@@ -269,9 +272,5 @@ class SoftBodies extends Template {
         areaPoly.clear();
 
         return ret;
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new SoftBodies());
     }
 }

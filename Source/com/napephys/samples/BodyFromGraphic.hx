@@ -1,14 +1,16 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Body From Graphic
- * Author: Luca Deltodesco
- *
- * Using MarchingSquares to generate Nape bodies
- * from both a BitmapData and a standard DisplayObject.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.DisplayObject;
+import flash.display.Sprite;
+import flash.display.StageQuality;
+import flash.events.Event;
 
 import nape.geom.AABB;
 import nape.geom.GeomPoly;
@@ -19,27 +21,28 @@ import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.shape.Polygon;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+import openfl.Assets;
 
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.display.DisplayObject;
-import flash.display.Sprite;
-import flash.display.StageQuality;
+/**
+ * Sample: Body From Graphic
+ * Author: Luca Deltodesco
+ *
+ * Using MarchingSquares to generate Nape bodies
+ * from both a BitmapData and a standard DisplayObject.
+ */
 
-@:bitmap("cog.png") class Cog extends BitmapData {}
-class BodyFromGraphic extends Template {
-    function new() {
+class BodyFromGraphic extends HandTemplate
+{
+    public function new()
+    {
         super({
             gravity : Vec2.get(0, 600),
             noReset : true
         });
     }
 
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -50,10 +53,15 @@ class BodyFromGraphic extends Template {
         // Create some Bodies generated from a Bitmap (the cogs)
         // With a body generated from a DisplayObject inside
         // (the intersected circles).
-        var cogIso = new BitmapDataIso(new Cog(0,0), 0x80);
+        var cogIso = new BitmapDataIso(Assets.getBitmapData("assets/cog.png"), 0x80);
+        #if flash
         var cogBody = IsoBody.run(cogIso, cogIso.bounds);
+        #else
+        var cogBody = IsoBody.run(cogIso.iso, cogIso.bounds);
+        #end
 
-        function circles() {
+        function circles():DisplayObject
+        {
             var displayObject = new Sprite();
             displayObject.graphics.lineStyle(0,0,0);
             displayObject.graphics.beginFill(0, 1);
@@ -64,35 +72,58 @@ class BodyFromGraphic extends Template {
             return displayObject;
         }
         var objIso = new DisplayObjectIso(circles());
+        var objBody:Body = null;
         // Flash requires an object to be on stage for hitTestPoint used
         // by the iso-function to work correctly. SIGH.
+        function onRemovedFromStage(_):Void
+        {
+            objIso.displayObject.removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+            for (i in 0...4) {
+            for (j in 0...2) {
+                var body1:Body = cogBody.copy();
+                body1.position.setxy(100 + 200*i, 400 - 200*j);
+                body1.space = space;
+
+                var graphic1:DisplayObject = cogIso.graphic();
+                graphic1.alpha = 0.6;
+                addChild(graphic1);
+                body1.userData.graphic = graphic1;
+
+                var body2:Body = objBody.copy();
+                body2.position.setxy(100 + 200*i, 400 - 200*j);
+                body2.space = space;
+
+                var graphic2:DisplayObject = circles();
+                graphic2.alpha = 0.6;
+                addChild(graphic2);
+                body2.userData.graphic = graphic2;
+            }}
+        }
+        function onAddedToStage(_):Void
+        {
+            objIso.displayObject.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+            objIso.displayObject.addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+            // OpenFL doesn't actually fire the Event.ADDED_TO_STAGE add an appropriate time
+            // basically removeChild doesn't work until an frame step.
+            #if flash
+            objBody = IsoBody.run(objIso, objIso.bounds);
+            removeChild(objIso.displayObject);
+            #else
+            function onEnterFrame(_):Void
+            {
+                removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+                objBody = IsoBody.run(objIso.iso, objIso.bounds);
+                removeChild(objIso.displayObject);
+            }
+            addEventListener(Event.ENTER_FRAME, onEnterFrame);
+            #end
+        }
+        objIso.displayObject.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         addChild(objIso.displayObject);
-        var objBody = IsoBody.run(objIso, objIso.bounds);
-        removeChild(objIso.displayObject);
-
-        for (i in 0...4) {
-        for (j in 0...2) {
-            var body = cogBody.copy();
-            body.position.setxy(100 + 200*i, 400 - 200*j);
-            body.space = space;
-
-            var graphic:DisplayObject = cogIso.graphic();
-            graphic.alpha = 0.6;
-            addChild(graphic);
-            body.userData.graphic = graphic;
-
-            body = objBody.copy();
-            body.position.setxy(100 + 200*i, 400 - 200*j);
-            body.space = space;
-
-            graphic = circles();
-            graphic.alpha = 0.6;
-            addChild(graphic);
-            body.userData.graphic = graphic;
-        }}
     }
 
-    override function postUpdate(deltaTime:Float) {
+    override private function postUpdate(deltaTime:Float):Void
+    {
         // Update positions for Flash graphics.
         for (body in space.liveBodies) {
             var graphic:Null<DisplayObject> = body.userData.graphic;
@@ -106,13 +137,10 @@ class BodyFromGraphic extends Template {
             position.dispose();
         }
     }
-
-    static function main() {
-        flash.Lib.current.addChild(new BodyFromGraphic());
-    }
 }
 
-class IsoBody {
+class IsoBody
+{
     public static function run(iso:IsoFunctionDef, bounds:AABB, granularity:Vec2=null, quality:Int=2, simplification:Float=1.5) {
         var body = new Body();
 
@@ -145,7 +173,8 @@ class IsoBody {
     }
 }
 
-class DisplayObjectIso implements IsoFunction {
+class DisplayObjectIso#if flash implements IsoFunction#end
+{
     public var displayObject:DisplayObject;
     public var bounds:AABB;
 
@@ -154,7 +183,7 @@ class DisplayObjectIso implements IsoFunction {
         this.bounds = AABB.fromRect(displayObject.getBounds(displayObject));
     }
 
-    public function iso(x:Float, y:Float) {
+    public function iso(x:Float, y:Float):Float {
         // Best we can really do with a generic DisplayObject
         // is to return a binary value {-1, 1} depending on
         // if the sample point is in or out side.
@@ -163,7 +192,8 @@ class DisplayObjectIso implements IsoFunction {
     }
 }
 
-class BitmapDataIso implements IsoFunction {
+class BitmapDataIso#if flash implements IsoFunction#end
+{
     public var bitmap:BitmapData;
     public var alphaThreshold:Float;
     public var bounds:AABB;
@@ -178,7 +208,7 @@ class BitmapDataIso implements IsoFunction {
         return new Bitmap(bitmap);
     }
 
-    public function iso(x:Float, y:Float) {
+    public function iso(x:Float, y:Float):Float {
         // Take 4 nearest pixels to interpolate linearly.
         // This gives us a smooth iso-function for which
         // we can use a lower quality in MarchingSquares for

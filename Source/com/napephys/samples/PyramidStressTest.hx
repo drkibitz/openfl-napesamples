@@ -1,7 +1,17 @@
 package com.napephys.samples;
 
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import nape.geom.Vec2;
+import nape.phys.Body;
+import nape.phys.BodyType;
+import nape.shape.Polygon;
+import nape.space.Broadphase;
+
 /**
- *
  * Sample: Pyramid Stress-Test
  * Author: Luca Deltodesco
  *
@@ -15,23 +25,12 @@ package com.napephys.samples;
  * Even so, many people (Especcially with newer desktops) will find this
  * sample has a high FPS! In a real world scenario, we will likely use
  * far fewer iterations and not have such large stacks of blocks!
- *
  */
 
-import nape.geom.Vec2;
-import nape.phys.Body;
-import nape.phys.BodyType;
-import nape.shape.Circle;
-import nape.shape.Polygon;
-import nape.space.Broadphase;
-
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
-
-class PyramidStressTest extends Template {
-    function new() {
+class PyramidStressTest extends HandTemplate
+{
+    public function new()
+    {
         super({
             gravity: Vec2.get(0, 600),
             // SWEEP_AND_PRUNE is a bit more effecient in this very simple
@@ -55,7 +54,8 @@ class PyramidStressTest extends Template {
         });
     }
 
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -64,9 +64,15 @@ class PyramidStressTest extends Template {
         // Disable angle indicators on shapes
         debug.drawShapeAngleIndicators = false;
 
+        #if (cpp||flash)
         var boxWidth = 10;
         var boxHeight = 14;
         var pyramidHeight = 40; //820 blocks
+        #else
+        var boxWidth = 20;
+        var boxHeight = 28;
+        var pyramidHeight = 20;
+        #end
 
         for (y in 1...(pyramidHeight+1)) {
         for (x in 0...y) {
@@ -79,9 +85,5 @@ class PyramidStressTest extends Template {
             block.shapes.add(new Polygon(Polygon.box(boxWidth, boxHeight)));
             block.space = space;
         }}
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new PyramidStressTest());
     }
 }

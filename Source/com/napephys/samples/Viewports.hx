@@ -1,21 +1,11 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Viewports
- * Author: Luca Deltodesco
- *
- * In this sample, I show how you can use the Nape callbacks system
- * to very effeciently keep track of what objects in a physics world
- * are visible.
- *
- * Whilst it is possible to use the spatial query methods of the Space
- * object such as bodiesInShape to achieve the same overall result,
- * we achieve greater performance by using the nape 'pipeline' as it
- * were instead: Both because we only perform actions when an object
- * changes its visible status, and because it is faster to determine
- * intersections in this way, than it is by using the spatial methods.
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import flash.display.DisplayObject;
 
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
@@ -31,15 +21,29 @@ import nape.shape.Polygon;
 import nape.shape.Shape;
 import nape.util.Debug;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: Viewports
+ * Author: Luca Deltodesco
+ *
+ * In this sample, I show how you can use the Nape callbacks system
+ * to very effeciently keep track of what objects in a physics world
+ * are visible.
+ *
+ * Whilst it is possible to use the spatial query methods of the Space
+ * object such as bodiesInShape to achieve the same overall result,
+ * we achieve greater performance by using the nape 'pipeline' as it
+ * were instead: Both because we only perform actions when an object
+ * changes its visible status, and because it is faster to determine
+ * intersections in this way, than it is by using the spatial methods.
+ */
 
-import flash.display.DisplayObject;
+class Viewports extends HandTemplate
+{
+    private var viewports:Compound;
+    private var viewableObjects:Array<Body>;
 
-class Viewports extends Template {
-    function new() {
+    public function new()
+    {
         super({
             // We're going to draw things in a non-standard way
             // so tell Template not to auto-draw Space.
@@ -47,10 +51,8 @@ class Viewports extends Template {
         });
     }
 
-    var viewports:Compound;
-    var viewableObjects:Array<Body>;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -149,7 +151,8 @@ class Viewports extends Template {
         }
     }
 
-    function enterViewportHandler(cb:InteractionCallback) {
+    private function enterViewportHandler(cb:InteractionCallback):Void
+    {
         // We only assigned viewableType to Bodys, so this
         // is always safe.
         var viewableBody = cb.int2.castBody;
@@ -158,7 +161,8 @@ class Viewports extends Template {
         graphic.alpha = 1.0;
     }
 
-    function exitViewportHandler(cb:InteractionCallback) {
+    private function exitViewportHandler(cb:InteractionCallback):Void
+    {
         // We only assigned viewableType to Bodys, so this
         // is always safe.
         var viewableBody = cb.int2.castBody;
@@ -167,7 +171,8 @@ class Viewports extends Template {
         graphic.alpha = 0.25;
     }
 
-    override function postUpdate(deltaTime:Float) {
+    override private function postUpdate(deltaTime:Float):Void
+    {
         // draw hand constraint if active.
         if (hand.active) debug.draw(hand);
 
@@ -181,9 +186,5 @@ class Viewports extends Template {
             graphic.y = b.position.y;
             graphic.rotation = (b.rotation * 180/Math.PI) % 360;
         }
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new Viewports());
     }
 }

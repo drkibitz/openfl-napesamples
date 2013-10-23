@@ -1,21 +1,9 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: One-Way Platforms
- * Author: Luca Deltodesco
- *
- * Using the PreListener callbacks to selectively ignore
- * collisions based on contact normals enabling one-way
- * platforms.
- *
- * Additionally, demonstrate the use of Body surfaceVel to
- * provide conveyor belts and standard InteractionListeners
- * to teleport bodies instantly on overlap.
- *
- * As well as the use of Kinematic bodies.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
 
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
@@ -32,23 +20,36 @@ import nape.phys.Material;
 import nape.shape.Circle;
 import nape.shape.Polygon;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: One-Way Platforms
+ * Author: Luca Deltodesco
+ *
+ * Using the PreListener callbacks to selectively ignore
+ * collisions based on contact normals enabling one-way
+ * platforms.
+ *
+ * Additionally, demonstrate the use of Body surfaceVel to
+ * provide conveyor belts and standard InteractionListeners
+ * to teleport bodies instantly on overlap.
+ *
+ * As well as the use of Kinematic bodies.
+ */
 
-class OneWayPlatforms extends Template {
-    function new() {
+class OneWayPlatforms extends HandTemplate
+{
+    private var oneWayType:CbType;
+    private var teleporterType:CbType;
+    private var kinematics:Array<Body>;
+
+    public function new()
+    {
         super({
             gravity: Vec2.get(0, 600)
         });
     }
 
-    var oneWayType:CbType;
-    var teleporterType:CbType;
-    var kinematics:Array<Body>;
-
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -133,7 +134,8 @@ class OneWayPlatforms extends Template {
         }
     }
 
-    override function postUpdate(deltaTime:Float) {
+    override private function postUpdate(deltaTime:Float):Void
+    {
         // Teleport kinematic to bottom of screen once it reaches top belt.
         for (k in kinematics) {
             if (k.position.y < k.userData.targetHeight) {
@@ -142,7 +144,8 @@ class OneWayPlatforms extends Template {
         }
     }
 
-    function kinematic(x:Float, width:Float, speed:Float, target:Float) {
+    private function kinematic(x:Float, width:Float, speed:Float, target:Float):Void
+    {
         var platform = new Body(BodyType.KINEMATIC);
         platform.position.setxy(x, 680);
         platform.shapes.add(new Polygon(Polygon.rect(0, 0, width, 1)));
@@ -152,7 +155,8 @@ class OneWayPlatforms extends Template {
         kinematics.push(platform);
     }
 
-    function conveyor(height:Float, speed:Float) {
+    private function conveyor(height:Float, speed:Float):Void
+    {
         var belt = new Body(BodyType.STATIC);
 
         belt.shapes.add(new Polygon(Polygon.rect(-20, height, 840, 10)));
@@ -162,7 +166,8 @@ class OneWayPlatforms extends Template {
         belt.space = space;
     }
 
-    function teleporterHandler(cb:InteractionCallback) {
+    private function teleporterHandler(cb:InteractionCallback):Void
+    {
         // Always valid given that we used CbType.ANY_BODY for first option type.
         var object = cb.int1.castBody;
 
@@ -180,7 +185,8 @@ class OneWayPlatforms extends Template {
         object.angularVel = 0;
     }
 
-    function oneWayHandler(cb:PreCallback):PreFlag {
+    private function oneWayHandler(cb:PreCallback):PreFlag
+    {
         // We assigned the listener to have the one-way platform as first
         // interactor.
         //
@@ -201,9 +207,5 @@ class OneWayPlatforms extends Template {
         else {
             return PreFlag.ACCEPT;
         }
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new OneWayPlatforms());
     }
 }

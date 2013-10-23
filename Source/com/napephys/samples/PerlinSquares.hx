@@ -1,7 +1,19 @@
 package com.napephys.samples;
 
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
+
+import nape.geom.AABB;
+import nape.geom.GeomPoly;
+import nape.geom.GeomPolyList;
+import nape.geom.IsoFunction;
+import nape.geom.Mat23;
+import nape.geom.MarchingSquares;
+import nape.geom.Vec2;
+
 /**
- *
  * Sample: Perlin Squares
  * Author: Luca Deltodesco
  *
@@ -14,52 +26,40 @@ package com.napephys.samples;
  * sufficiently fast at drawing filled polygons, that a
  * profiler will easily show 20% of time being spent on
  * rendering! sigh.
- *
  */
 
-import nape.geom.AABB;
-import nape.geom.GeomPoly;
-import nape.geom.GeomPolyList;
-import nape.geom.IsoFunction;
-import nape.geom.Mat23;
-import nape.geom.MarchingSquares;
-import nape.geom.Vec2;
+class PerlinSquares extends HandTemplate#if flash implements IsoFunction#end
+{
+    // Parameters for MarchingSquares
+    private var bounds:AABB;
+    private var cellSize:Vec2;
+    private var gridSize:Vec2;
+    private var quality:Int = 2;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+    // Perlin Noise parameters
+    private var perlinZ:Float = 0.0;
+    private var threshold:Float = 0.0;
 
-class PerlinSquares extends Template, implements IsoFunction {
-    function new() {
+    // Polygon lists for MarchingSquares and GeomPoly decompositions
+    // to avoid constantly creating new ones.
+    private var output:GeomPolyList;
+    private var output2:GeomPolyList;
+
+    public function new()
+    {
         // We use ShapeDebug as rendering large amounts of filled polygons
         // is slower with BitmapDebug.
         //
         // We aren't running any simulation so we don't need any Space nor
         // do we care about fixed time steps.
         super({
-            shapeDebug: true,
             noSpace: true,
             variableStep: true
         });
     }
 
-    // Parameters for MarchingSquares
-    var bounds:AABB;
-    var cellSize:Vec2;
-    var gridSize:Vec2;
-    var quality:Int = 2;
-
-    // Perlin Noise parameters
-    var perlinZ:Float = 0.0;
-    var threshold:Float = 0.0;
-
-    // Polygon lists for MarchingSquares and GeomPoly decompositions
-    // to avoid constantly creating new ones.
-    var output:GeomPolyList;
-    var output2:GeomPolyList;
-
-    override function init() {
+    override private function init():Void
+    {
         // Scale up debug draw so we can use a smaller area to use
         // for marching squares. Drawing the polygons with either
         // ShapeDebug or BitmapDebug is pretty damn expensive, so this
@@ -75,7 +75,8 @@ class PerlinSquares extends Template, implements IsoFunction {
     }
 
 
-    override function preStep(deltaTime:Float) {
+    override private function preStep(deltaTime:Float):Void
+    {
         perlinZ += deltaTime;
         threshold = 0.35 * Math.cos(0.3 * perlinZ);
 
@@ -85,7 +86,12 @@ class PerlinSquares extends Template, implements IsoFunction {
         // Here, we're supplying a GeomPolyList in which to return the results
         // to avoid creating a new List every single time.
         var polygons = MarchingSquares.run(
-            this, bounds, cellSize, 2,
+            #if flash
+            this,
+            #else
+            iso,
+            #end
+            bounds, cellSize, 2,
             gridSize, true, output
         );
 
@@ -130,14 +136,16 @@ class PerlinSquares extends Template, implements IsoFunction {
 
         // untyped __int__ performs better than Std.int when we're only
         // targetting flash.
+        #if flash
         var red:Int = untyped __int__(r*0xff);
         var grn:Int = untyped __int__(g*0xff);
         var blu:Int = untyped __int__(b*0xff);
+        #else
+        var red:Int = Std.int(r*0xff);
+        var grn:Int = Std.int(g*0xff);
+        var blu:Int = Std.int(b*0xff);
+        #end
         return (red << 16) | (grn << 8) | blu;
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new PerlinSquares());
     }
 }
 
@@ -145,9 +153,15 @@ class Perlin3D {
     public static inline function noise(x:Float, y:Float, z:Float) {
         // untyped __int__ performs better than Std.int when we're only
         // targetting flash.
+        #if flash
         var X:Int = untyped __int__(x); x -= X; X &= 0xff;
         var Y:Int = untyped __int__(y); y -= Y; Y &= 0xff;
         var Z:Int = untyped __int__(z); z -= Z; Z &= 0xff;
+        #else
+        var X:Int = Std.int(x); x -= X; X &= 0xff;
+        var Y:Int = Std.int(y); y -= Y; Y &= 0xff;
+        var Z:Int = Std.int(z); z -= Z; Z &= 0xff;
+        #end
         var u = fade(x); var v = fade(y); var w = fade(z);
         var A = p(X)  +Y; var AA = p(A)+Z; var AB = p(A+1)+Z;
         var B = p(X+1)+Y; var BA = p(B)+Z; var BB = p(B+1)+Z;
@@ -161,8 +175,8 @@ class Perlin3D {
                                        grad(p(BB+1), x-1, y-1, z-1 ))));
     }
 
-    static inline function fade(t:Float) return t*t*t*(t*(t*6-15)+10)
-    static inline function lerp(t:Float, a:Float, b:Float) return a + t*(b-a)
+    static inline function fade(t:Float) return t*t*t*(t*(t*6-15)+10);
+    static inline function lerp(t:Float, a:Float, b:Float) return a + t*(b-a);
     static inline function grad(hash:Int, x:Float, y:Float, z:Float) {
         var h = hash&15;
         var u = h<8 ? x : y;
@@ -170,12 +184,12 @@ class Perlin3D {
         return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
     }
 
-    static inline function p(i:Int) return perm[i]
+    static inline function p(i:Int) return perm[i];
     static var perm:#if flash10 flash.Vector<Int> #else Array<Int> #end;
 
     public static function initNoise() {
         #if flash10
-    		perm = new flash.Vector<Int>(512,true);
+            perm = new flash.Vector<Int>(512,true);
         #else
             perm = new Array<Int>();
         #end

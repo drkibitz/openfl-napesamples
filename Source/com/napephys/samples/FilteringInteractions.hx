@@ -1,16 +1,9 @@
 package com.napephys.samples;
 
-/**
- *
- * Sample: Filtering Interactions
- * Author: Luca Deltodesco
- *
- * In this sample, I show to make use of the InteractionFilter
- * object, together with the fluidEnabled and sensorEnabled Shape
- * flags to control what type of interaction occurs between various
- * types of object.
- *
- */
+// Template class is used so that this sample may
+// be as concise as possible in showing Nape features without
+// any of the boilerplate that makes up the sample interfaces.
+import com.drkibitz.napesamples.HandTemplate;
 
 import nape.geom.Vec2;
 import nape.phys.Body;
@@ -18,19 +11,26 @@ import nape.phys.BodyType;
 import nape.shape.Circle;
 import nape.shape.Polygon;
 
-// Template class is used so that this sample may
-// be as concise as possible in showing Nape features without
-// any of the boilerplate that makes up the sample interfaces.
-import com.napephys.samples.common.Template;
+/**
+ * Sample: Filtering Interactions
+ * Author: Luca Deltodesco
+ *
+ * In this sample, I show to make use of the InteractionFilter
+ * object, together with the fluidEnabled and sensorEnabled Shape
+ * flags to control what type of interaction occurs between various
+ * types of object.
+ */
 
-class FilteringInteractions extends Template {
-    function new() {
+class FilteringInteractions extends HandTemplate
+{
+    public function new() {
         super({
             gravity: Vec2.get(0, 600)
         });
     }
 
-    override function init() {
+    override private function init():Void
+    {
         var w = stage.stageWidth;
         var h = stage.stageHeight;
 
@@ -137,9 +137,5 @@ class FilteringInteractions extends Template {
             pentagonShape.body = pentagonBody;
             pentagonBody.space = space;
         }
-    }
-
-    static function main() {
-        flash.Lib.current.addChild(new FilteringInteractions());
     }
 }
