@@ -4,8 +4,6 @@ import com.drkibitz.napesamples.BasicTemplate;
 
 import flash.events.Event;
 import flash.system.System;
-import flash.text.TextField;
-import flash.text.TextFormat;
 import flash.Lib;
 
 typedef StepTemplateParams = {> BasicTemplateParams,
@@ -20,7 +18,6 @@ class StepTemplate extends BasicTemplate
     private var baseMemory:Float;
     private var prevTime:Int;
     private var smoothFps:Float = -1;
-    private var textField:TextField;
 
     public function new(params:StepTemplateParams)
     {
@@ -39,33 +36,16 @@ class StepTemplate extends BasicTemplate
         super(params);
     }
 
-    override private function willAddToStage():Void
-    {
-        textField = new TextField();
-        textField.defaultTextFormat = new TextFormat("Verdana", 10, 0xffffff);
-        textField.selectable = false;
-        textField.width = 128;
-        textField.height = 800;
-        addChild(textField);
-
-        baseMemory = System.totalMemory;
-        prevTime = Lib.getTimer();
-    }
-
     override private function didAddToStage():Void
     {
+        baseMemory = System.totalMemory;
+        prevTime = Lib.getTimer();
         addEventListener(Event.ENTER_FRAME, this_onEnterFrame);
     }
 
     override private function willRemoveFromStage():Void
     {
         removeEventListener(Event.ENTER_FRAME, this_onEnterFrame);
-    }
-
-    override private function didRemoveFromStage():Void
-    {
-        removeChild(textField);
-        textField = null;
     }
 
     private function this_onEnterFrame(event:Event):Void
@@ -78,14 +58,19 @@ class StepTemplate extends BasicTemplate
 
         var fps = (1000 / deltaTime);
         smoothFps = (smoothFps == -1 ? fps : (smoothFps * 0.97) + (fps * 0.03));
-        var text = "fps: " + ((""+smoothFps).substr(0, 5)) + "\n" +
-                   "mem: " + ((""+(System.totalMemory - baseMemory) / (1024 * 1024)).substr(0, 5)) + "Mb";
+        var text = "fps: " + ((""+smoothFps).substr(0, 5)) + "\n";
+        #if html5
+        text += "mem: n/a";
+        #else
+        text += "mem: " + ((""+(System.totalMemory - baseMemory) / (1024 * 1024)).substr(0, 5)) + "Mb";
+        #end
+
         if (space != null) {
             text += "\n"+
                     "velocity-iterations: " + params.velIterations + "\n" +
                     "position-iterations: " + params.posIterations + "\n";
         }
-        textField.text = text;
+        textField.text = "title: " + BasicTemplate.title + "\n" + text;
 
         var noStepsNeeded = false;
 

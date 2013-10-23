@@ -3,6 +3,8 @@ package com.drkibitz.napesamples;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.system.System;
+import flash.text.TextField;
+import flash.text.TextFormat;
 
 import nape.geom.Vec2;
 import nape.phys.Body;
@@ -14,23 +16,35 @@ import nape.util.Debug;
 import nape.util.ShapeDebug;
 
 typedef BasicTemplateParams = {
-    ?gravity : Vec2,
     ?broadphase : Broadphase,
-    ?noSpace : Bool,
-    ?noReset : Bool
+    ?gravity : Vec2,
+    ?noDebug : Bool,
+    ?noReset : Bool,
+    ?noSpace : Bool
 };
 
 class BasicTemplate extends Sprite implements ISample
 {
-    public var debug:Debug;
-    public var params:Dynamic;
-    public var space:Space;
+    public static var title:String;
 
+    /** Implement ISample */
+    public var params:Dynamic;
+
+    private var debug:Debug;
+    private var space:Space;
+    private var textField:TextField;
+
+    /**
+     * Constructor
+     */
     public function new(params:BasicTemplateParams)
     {
         super();
 
         this.params = params;
+        if (params.noDebug == null) {
+            params.noDebug = false;
+        }
         if (params.noSpace == null) {
             params.noSpace = false;
         }
@@ -38,7 +52,6 @@ class BasicTemplate extends Sprite implements ISample
             params.noReset = false;
         }
 
-        willAddToStage();
         if (stage != null) {
             this_onAddedToStage(null);
         } else {
@@ -46,22 +59,17 @@ class BasicTemplate extends Sprite implements ISample
         }
     }
 
-    public function createBorder():Body
-    {
-        var border = new Body(BodyType.STATIC);
-        border.shapes.add(new Polygon(Polygon.rect(0, 0, -2, stage.stageHeight)));
-        border.shapes.add(new Polygon(Polygon.rect(0, 0, stage.stageWidth, -2)));
-        border.shapes.add(new Polygon(Polygon.rect(stage.stageWidth, 0, 2, stage.stageHeight)));
-        border.shapes.add(new Polygon(Polygon.rect(0, stage.stageHeight, stage.stageWidth, 2)));
-        border.space = space;
-        border.debugDraw = false;
-        return border;
-    }
-
+    /**
+     * Implement ISample
+     */
     public function removeFromStage():Void
     {
         if (stage != null) {
             addEventListener(Event.REMOVED_FROM_STAGE, this_onRemovedFromStage);
+
+            stage.removeChild(textField);
+            textField = null;
+
             if (space != null) {
                 space.clear();
             }
@@ -71,6 +79,9 @@ class BasicTemplate extends Sprite implements ISample
         }
     }
 
+    /**
+     * Implement ISample
+     */
     public function reset():Void
     {
         if (space != null) {
@@ -83,6 +94,24 @@ class BasicTemplate extends Sprite implements ISample
         init();
     }
 
+    /**
+     * Common helper
+     */
+    private function createBorder():Body
+    {
+        var border = new Body(BodyType.STATIC);
+        border.shapes.add(new Polygon(Polygon.rect(0, 0, -2, stage.stageHeight)));
+        border.shapes.add(new Polygon(Polygon.rect(0, 0, stage.stageWidth, -2)));
+        border.shapes.add(new Polygon(Polygon.rect(stage.stageWidth, 0, 2, stage.stageHeight)));
+        border.shapes.add(new Polygon(Polygon.rect(0, stage.stageHeight, stage.stageWidth, 2)));
+        border.space = space;
+        border.debugDraw = false;
+        return border;
+    }
+
+    /**
+     * Event.ADDED_TO_STAGE listener
+     */
     private function this_onAddedToStage(?event:Event):Void
     {
         if (event != null) {
@@ -93,20 +122,35 @@ class BasicTemplate extends Sprite implements ISample
             space = new Space(params.gravity, params.broadphase);
         }
 
-        debug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
-            #if html5
-            stage.backgroundColor
-            #else
-            stage.opaqueBackground
-            #end
-        );
-        debug.drawConstraints = true;
-        addChild(debug.display);
+        if (!params.noDebug) {
+            debug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
+                #if html5
+                stage.backgroundColor
+                #else
+                stage.opaqueBackground
+                #end
+            );
+            debug.drawConstraints = true;
+            addChild(debug.display);
+        }
+
+        textField = new TextField();
+        textField.defaultTextFormat = new TextFormat("Verdana", 10, 0xffffff);
+        textField.selectable = false;
+        textField.width = 150;
+        textField.height = 800;
+        if (title != null && title != "") {
+            textField.text = "title: " + title;
+        }
+        stage.addChild(textField);
 
         didAddToStage();
         init();
     }
 
+    /**
+     * Event.REMOVED_FROM_STAGE listener
+     */
     private function this_onRemovedFromStage(event:Event):Void
     {
         if (debug != null) {
@@ -124,23 +168,11 @@ class BasicTemplate extends Sprite implements ISample
         didRemoveFromStage();
     }
 
-    // to be overriden
-    private function init():Void
-    {}
 
     // to be overriden
-    private function willAddToStage():Void
-    {}
-    private function didAddToStage():Void
-    {}
-
-    // to be overriden
-    private function willRemoveFromStage():Void
-    {}
-    private function didRemoveFromStage():Void
-    {}
-
-    // to be overriden
-    private function didClear():Void
-    {}
+    private function init():Void {}
+    private function didAddToStage():Void {}
+    private function willRemoveFromStage():Void {}
+    private function didRemoveFromStage():Void {}
+    private function didClear():Void {}
 }
