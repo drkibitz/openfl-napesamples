@@ -5,6 +5,7 @@ package com.napephys.samples;
 // any of the boilerplate that makes up the sample interfaces.
 import com.drkibitz.napesamples.HandTemplate;
 
+import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.BitmapDataChannel;
 import flash.display.BlendMode;
@@ -23,7 +24,9 @@ import nape.shape.Circle;
 import nape.shape.Polygon;
 import nape.space.Space;
 
+#if !flash
 import openfl.Assets;
+#end
 
 /**
  * Sample: Destructible Terrain
@@ -59,9 +62,23 @@ class DestructibleTerrain extends HandTemplate
         createBorder();
 
         // Initialise terrain bitmap.
-        // OpenFL's perlinNoise implementation doesn't work
+        #if flash
+        // Leaving the original alpha channel implementation for posterity
+        // Using the blue channel for other platforms
         var bit = new BitmapData(w, h, true, 0);
         bit.perlinNoise(200, 200, 2, 0x3ed, false, true, BitmapDataChannel.ALPHA, false);
+        #else
+        // OpenFL's perlinNoise implementation doesn't work, just use a prerendered image
+        // var bit = new BitmapData(w, h, true, 0);
+        // bit.perlinNoise(200, 200, 2, 0x3ed, false, true, BitmapDataChannel.BLUE, false);
+        var bit = Assets.getBitmapData('assets/perlinNoise.png');
+        #end
+
+        // Just show what the terrain looks like on screen
+        // var minimap = new Bitmap(bit);
+        // minimap.scaleX = minimap.scaleY = 0.2;
+        // minimap.x = stage.stageWidth - minimap.width;
+        // addChild(minimap);
 
         // Create initial terrain state, invalidating the whole screen.
         terrain = new Terrain(bit, 30, 5);
@@ -69,15 +86,23 @@ class DestructibleTerrain extends HandTemplate
 
         // Create bomb sprite for destruction
         bomb = new Sprite();
-        bomb.graphics.beginFill(0xffffff, 1);
+        // For flash's alpha implementation the fill color doesn't matter.
+        // For all other platforms it does, it must be black to be erased.
+        bomb.graphics.beginFill(0x000000, 1);
         bomb.graphics.drawCircle(0, 0, 40);
     }
 
     private function explosion(pos:Vec2):Void
     {
         // Erase bomb graphic out of terrain.
-        // OpenFL's implementation does not do anything with BlenMode
+        #if flash
+        // Leaving the original alpha channel implementation for posterity
+        // Using the blue channel for other platforms
         terrain.bitmap.draw(bomb, new Matrix(1, 0, 0, 1, pos.x, pos.y), null, BlendMode.ERASE);
+        #else
+        // OpenFL's implementation does ignores BlenMode, hence using the blue channel ;)
+        terrain.bitmap.draw(bomb, new Matrix(1, 0, 0, 1, pos.x, pos.y));
+        #end
 
         // Invalidate region of terrain effected.
         var region = AABB.fromRect(bomb.getBounds(bomb));
@@ -194,6 +219,7 @@ class Terrain#if flash implements IsoFunction#end
 
     //iso-function for terrain, computed as a linearly-interpolated
     //alpha threshold from bitmap.
+    // Channel Reference: (A & 0xFF) << 24, (R & 0xFF) << 16, (G & 0xFF) << 8, (B & 0xFF);
     public function iso(x:Float, y:Float):Float
     {
         var ix = Std.int(x); if(ix<0) ix = 0; else if(ix>=bitmap.width)  ix = bitmap.width -1;
@@ -203,10 +229,21 @@ class Terrain#if flash implements IsoFunction#end
         var gx = 1-fx;
         var gy = 1-fy;
 
+        // Leaving the original alpha channel implementation for posterity
+        // Using the blue channel for other platforms
+        #if flash
+        // Use the alpha channel
         var a00 = bitmap.getPixel32(ix,iy)>>>24;
         var a01 = bitmap.getPixel32(ix,iy+1)>>>24;
         var a10 = bitmap.getPixel32(ix+1,iy)>>>24;
         var a11 = bitmap.getPixel32(ix+1,iy+1)>>>24;
+        #else
+        // Use the blue channel
+        var a00 = bitmap.getPixel(ix,iy);
+        var a01 = bitmap.getPixel(ix,iy+1);
+        var a10 = bitmap.getPixel(ix+1,iy);
+        var a11 = bitmap.getPixel(ix+1,iy+1);
+        #end
 
         var ret = gx*gy*a00 + fx*gy*a10 + gx*fy*a01 + fx*fy*a11;
         return 0x80-ret;
