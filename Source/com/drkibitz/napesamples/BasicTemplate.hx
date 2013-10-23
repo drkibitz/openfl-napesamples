@@ -93,12 +93,13 @@ class BasicTemplate extends Sprite implements ISample
             space = new Space(params.gravity, params.broadphase);
         }
 
-        #if (html5||neko)
-        var color = 0x333333;
-        #else
-        var color = stage.opaqueBackground;
-        #end
-        debug = new ShapeDebug(stage.stageWidth, stage.stageHeight, color);
+        debug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
+            #if html5
+            stage.backgroundColor
+            #else
+            stage.opaqueBackground
+            #end
+        );
         debug.drawConstraints = true;
         addChild(debug.display);
 

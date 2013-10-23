@@ -7,7 +7,7 @@
     <!-- output -->
     <app file="NapeTest" main="Main" path="Export" />
 
-    <window fps="60" background="#333333" />
+    <window fps="60" background="#000000"/>
     <window width="0" height="0" if="html5" />
 
     <!-- classpath, haxe libs -->
