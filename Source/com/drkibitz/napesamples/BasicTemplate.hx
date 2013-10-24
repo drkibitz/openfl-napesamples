@@ -124,15 +124,20 @@ class BasicTemplate extends Sprite implements ISample
         }
 
         if (!params.noDebug) {
-            debug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
+            var shapeDebug:ShapeDebug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
                 #if html5
                 stage.backgroundColor
                 #else
                 stage.opaqueBackground
                 #end
             );
-            debug.drawConstraints = true;
-            addChild(debug.display);
+            #if html5
+            // Doesn't get everything, some lineStyles in nape are hard coded
+            shapeDebug.thickness = 1;
+            #end
+            shapeDebug.drawConstraints = true;
+            addChild(shapeDebug.display);
+            debug = cast shapeDebug;
         }
 
         textField = new TextField();
