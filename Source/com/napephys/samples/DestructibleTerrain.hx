@@ -71,7 +71,7 @@ class DestructibleTerrain extends HandTemplate
         // OpenFL's perlinNoise implementation doesn't work, just use a prerendered image
         // var bit = new BitmapData(w, h, true, 0);
         // bit.perlinNoise(200, 200, 2, 0x3ed, false, true, BitmapDataChannel.BLUE, false);
-        var bit = Assets.getBitmapData('assets/perlinNoise.png');
+        var bit = Assets.getBitmapData('assets/perlinNoise.png', true);
         #end
 
         // Just show what the terrain looks like on screen

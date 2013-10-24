@@ -33,6 +33,9 @@ import openfl.Assets;
 
 class BodyFromGraphic extends HandTemplate
 {
+    private var cogIso:BitmapDataIso;
+    private var objIso:DisplayObjectIso;
+
     public function new()
     {
         super({
@@ -53,7 +56,7 @@ class BodyFromGraphic extends HandTemplate
         // Create some Bodies generated from a Bitmap (the cogs)
         // With a body generated from a DisplayObject inside
         // (the intersected circles).
-        var cogIso = new BitmapDataIso(Assets.getBitmapData("assets/cog.png"), 0x80);
+        cogIso = new BitmapDataIso(Assets.getBitmapData('assets/cog.png', true), 0x80);
         #if flash
         var cogBody = IsoBody.run(cogIso, cogIso.bounds);
         #else
@@ -71,7 +74,7 @@ class BodyFromGraphic extends HandTemplate
             displayObject.graphics.endFill();
             return displayObject;
         }
-        var objIso = new DisplayObjectIso(circles());
+        objIso = new DisplayObjectIso(circles());
         var objBody:Body = null;
         // Flash requires an object to be on stage for hitTestPoint used
         // by the iso-function to work correctly. SIGH.
@@ -120,6 +123,30 @@ class BodyFromGraphic extends HandTemplate
         }
         objIso.displayObject.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         addChild(objIso.displayObject);
+    }
+
+    override private function willRemoveFromStage():Void
+    {
+        for (body in space.liveBodies) {
+            var graphic:Null<DisplayObject> = body.userData.graphic;
+            if (graphic == null) continue;
+
+            removeChild(graphic);
+            body.userData.graphic = null;
+        }
+
+        if (cogIso != null) {
+            cogIso.bitmap = null;
+            cogIso.bounds = null;
+            cogIso = null;
+        }
+        if (objIso != null) {
+            objIso.bounds = null;
+            objIso.displayObject = null;
+            objIso = null;
+        }
+
+        super.willRemoveFromStage();
     }
 
     override private function postUpdate(deltaTime:Float):Void
