@@ -64,14 +64,18 @@ class PyramidStressTest extends HandTemplate
         // Disable angle indicators on shapes
         debug.drawShapeAngleIndicators = false;
 
-        #if (cpp||flash)
-        var boxWidth = 10;
-        var boxHeight = 14;
-        var pyramidHeight = 40; //820 blocks
-        #else
+        #if neko
+        var boxWidth = 40;
+        var boxHeight = 56;
+        var pyramidHeight = 10;
+        #elseif html5
         var boxWidth = 20;
         var boxHeight = 28;
         var pyramidHeight = 20;
+        #else
+        var boxWidth = 10;
+        var boxHeight = 14;
+        var pyramidHeight = 40; //820 blocks
         #end
 
         for (y in 1...(pyramidHeight+1)) {

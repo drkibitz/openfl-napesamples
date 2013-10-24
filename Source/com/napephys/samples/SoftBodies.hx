@@ -85,7 +85,13 @@ class SoftBodies extends HandTemplate
 
         // Add some box shaped soft-bodies.
         var poly = new GeomPoly(Polygon.box(60, 60));
+        #if neko
+        for (y in 4...5) {
+        #elseif html5
+        for (y in 4...6) {
+        #else
         for (y in 4...7) {
+        #end
         for (x in -2...3) {
             var body = polygonalBody(
                 Vec2.get(w/2 + x * 60, h - (y + 0.5) * 60),
@@ -99,7 +105,13 @@ class SoftBodies extends HandTemplate
 
         // Add some pentangonol shaped soft-bodies.
         var poly = new GeomPoly(Polygon.regular(30, 30, 5));
+        #if neko
+        for (y in 7...8) {
+        #elseif html5
+        for (y in 7...9) {
+        #else
         for (y in 7...10) {
+        #end
         for (x in -2...3) {
             var body = polygonalBody(
                 Vec2.get(w/2 + x * 60, h - (y + 0.5) * 60),

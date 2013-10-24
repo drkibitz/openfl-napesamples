@@ -68,10 +68,20 @@ class BodyFromGraphic extends HandTemplate
             var displayObject = new Sprite();
             displayObject.graphics.lineStyle(0,0,0);
             displayObject.graphics.beginFill(0, 1);
+            // Something is going wrong with something in html5
+            // For now just make the radius smaller.
+            // It still won't work right, but won't bug out everything.
+            #if html5
+            displayObject.graphics.drawCircle(-10, 17.32, 20);
+            displayObject.graphics.drawCircle(-10, -17.32, 20);
+            displayObject.graphics.drawCircle(20, 0, 20);
+            #else
             displayObject.graphics.drawCircle(-10, 17.32, 30);
             displayObject.graphics.drawCircle(-10, -17.32, 30);
             displayObject.graphics.drawCircle(20, 0, 30);
+            #end
             displayObject.graphics.endFill();
+            displayObject.cacheAsBitmap = true;
             return displayObject;
         }
         objIso = new DisplayObjectIso(circles());

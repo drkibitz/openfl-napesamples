@@ -42,7 +42,8 @@ class Main extends Sprite
                 // This is partially broken on html5, inner circles don't work correctly.
                 // I think this has to do with hitTestPoint but not sure.
                 // Note: This also needed work arounds for other targets as well.
-                sampleClass:#if html5 DisabledSample#else BodyFromGraphic#end
+                // The circles in the middle vary from target to target.
+                sampleClass: BodyFromGraphic
             },
             {
                 title: 'Constraints',
@@ -50,9 +51,9 @@ class Main extends Sprite
             },
             {
                 title: 'Destructible Terrain',
-                // This is performance intensive for html5, and BitmapData.draw is not working.
-                // BitmapData.draw is needed to punch circle in terrain bitmap.
-                // Note: If this is fixed, be sure to increase cellSize for html5, it can't take it.
+                // This is too performance intensive for html5, and BitmapData.draw is not working.
+                // BitmapData.draw is needed to punch a circle into the terrain bitmap.
+                // Note: If this is fixed, be sure to increase cellSize for html5!
                 sampleClass:#if html5 DisabledSample#else DestructibleTerrain#end
             },
             {
@@ -81,14 +82,15 @@ class Main extends Sprite
             },
             {
                 title: 'Pyramid Stress Test',
+                // This is very performance intensive for neko and html5
+                // The number of bodies is lowered for each of these targets
                 sampleClass: PyramidStressTest
             },
             {
                 title: 'Soft Bodies',
-                // This is performance intensive for neko and html5
-                // Originally I thought I would just lower the number of bodies,
-                // but it's still too slow for comfort. I reccommend against it.
-                sampleClass:#if (html5||neko) DisabledSample#else SoftBodies#end
+                // This is very performance intensive for neko and html5
+                // The number of bodies is lowered for each of these targets
+                sampleClass: SoftBodies
             },
             {
                 title: 'Spatial Queries',
