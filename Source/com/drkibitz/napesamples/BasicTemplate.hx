@@ -125,13 +125,15 @@ class BasicTemplate extends Sprite implements ISample
 
         if (!params.noDebug) {
             var shapeDebug:ShapeDebug = new ShapeDebug(stage.stageWidth, stage.stageHeight,
-                #if html5
+                #if flash
+                stage.color
+                #elseif html5
                 stage.backgroundColor
                 #else
                 stage.opaqueBackground
                 #end
             );
-            #if html5
+            #if (html5||flash)
             // Doesn't get everything, some lineStyles in nape are hard coded
             shapeDebug.thickness = 1;
             #end
