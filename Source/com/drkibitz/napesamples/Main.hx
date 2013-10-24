@@ -1,4 +1,4 @@
-package;
+package com.drkibitz.napesamples;
 
 import com.drkibitz.napesamples.DisabledSample;
 import com.drkibitz.napesamples.BasicTemplate;
