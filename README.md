@@ -8,13 +8,13 @@ Get as many of the samples to run in as many targets as possible.
 
 ## Build
 
-This project combines all samples into one application. Build with `openfl test` for any target, and change samples at runtime with keyboard controls.
+This project combines all samples into one application. Build with `openfl test` for any target, and change samples at runtime with keyboard/screen controls.
 
 ## Controls
 - Change samples with the arrow keys
 - Reset current sample with the "r" key
 - Use the mouse to interact with objects in most samples
-- *TODO: Mobile screen controls (Just tap to change for now, object interaction still works)*
+- For mobile, corresponding screen controls are used
 
 ## Issues
 

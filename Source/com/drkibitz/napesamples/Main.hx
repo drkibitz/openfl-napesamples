@@ -7,9 +7,13 @@ import com.drkibitz.napesamples.ISample;
 import com.napephys.samples.*;
 
 import flash.display.Sprite;
-import flash.events.KeyboardEvent;
-import flash.events.MouseEvent;
 import flash.system.System;
+#if mobile
+import flash.display.DisplayObject;
+import flash.events.MouseEvent;
+#else
+import flash.events.KeyboardEvent;
+#end
 
 typedef SampleDef = {
     title:String,
@@ -99,9 +103,12 @@ class Main extends Sprite
             }
         ];
 
-        // TODO: Implement an on-screen controller
         #if mobile
-        stage.addEventListener(MouseEvent.CLICK, nextSample);
+        var screenControls = new ScreenControls();
+        screenControls.x = stage.stageWidth - screenControls.width;
+        screenControls.y = stage.stageHeight - screenControls.height;
+        stage.addChild(screenControls);
+        screenControls.addEventListener(MouseEvent.CLICK, screenControls_onClick);
         #else
         stage.addEventListener(KeyboardEvent.KEY_DOWN, stage_onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, stage_onKeyUp);
@@ -139,6 +146,23 @@ class Main extends Sprite
         setSampleDefIndex(index);
     }
 
+    #if mobile
+    private function screenControls_onClick(event:MouseEvent):Void
+    {
+        var displayObject:DisplayObject = cast event.target;
+        var name:String = displayObject.name;
+        switch (name) {
+            case 'left':
+                previousSample();
+            case 'right':
+                nextSample();
+            case 'reset':
+                if (!currentSample.params.noReset) {
+                    currentSample.reset();
+                }
+        }
+    }
+    #else
     private function stage_onKeyDown(event:KeyboardEvent):Void
     {
         // 'r'
@@ -165,4 +189,5 @@ class Main extends Sprite
             currentSampleIsReset = false;
         }
     }
+    #end
 }
