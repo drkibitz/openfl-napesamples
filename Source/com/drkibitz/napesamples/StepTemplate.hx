@@ -77,7 +77,7 @@ class StepTemplate extends BasicTemplate
                 deltaTime = (1000 / 30);
             }
 
-            debug.clear();
+            if (debug != null) debug.clear();
 
             preStep(deltaTime * 0.001);
             if (space != null) {
@@ -98,7 +98,7 @@ class StepTemplate extends BasicTemplate
 
             if (steps == 0) {
                 noStepsNeeded = true;
-            } else {
+            } else if (debug != null) {
                 debug.clear();
             }
 
@@ -111,11 +111,11 @@ class StepTemplate extends BasicTemplate
         }
 
         if (!noStepsNeeded) {
-            if (space != null && !params.customDraw) {
+            if (space != null && debug != null && !params.customDraw) {
                 debug.draw(space);
             }
             postUpdate(deltaTime * 0.001);
-            debug.flush();
+            if (debug != null) debug.flush();
         }
     }
 
