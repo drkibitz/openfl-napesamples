@@ -50,7 +50,7 @@ class DrawTilesTest extends HandTemplate
 
         drawList = new Array<Float>();
 
-        objBitmapData = Assets.getBitmapData('assets/drkibitz48.png');
+        objBitmapData = Assets.getBitmapData('images/drkibitz48.png');
         tilesheet = new Tilesheet(objBitmapData);
         tilesheet.addTileRect(
             new Rectangle(0, 0, objBitmapData.width, objBitmapData.height));

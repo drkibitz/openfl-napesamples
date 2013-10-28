@@ -16,8 +16,8 @@
     <haxelib name="nape" />
 
     <!-- assets -->
-    <assets path="Assets" rename="assets" exclude="*.svg" />
-    <icon path="Assets/drkibitz48.png" />
+    <assets path="Assets/images" rename="images" include="*" />
+    <icon path="Assets/images/drkibitz48.png" />
 
     <!-- optimize output -->
     <haxeflag name="-dce std" />

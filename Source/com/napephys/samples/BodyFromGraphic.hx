@@ -56,7 +56,7 @@ class BodyFromGraphic extends HandTemplate
         // Create some Bodies generated from a Bitmap (the cogs)
         // With a body generated from a DisplayObject inside
         // (the intersected circles).
-        cogIso = new BitmapDataIso(Assets.getBitmapData('assets/cog.png', true), 0x80);
+        cogIso = new BitmapDataIso(Assets.getBitmapData('images/cog.png', true), 0x80);
         #if flash
         var cogBody = IsoBody.run(cogIso, cogIso.bounds);
         #else
