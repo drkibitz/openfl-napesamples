@@ -4,6 +4,7 @@ import com.drkibitz.napesamples.DisabledSample;
 import com.drkibitz.napesamples.BasicTemplate;
 import com.drkibitz.napesamples.ISample;
 
+import com.drkibitz.napesamples.samples.*;
 import com.napephys.samples.*;
 
 import flash.display.Sprite;
@@ -41,6 +42,10 @@ class Main extends Sprite
             {
                 title: 'Basic Simulation',
                 sampleClass: BasicSimulation
+            },
+            {
+                title: 'Draw Tiles Test',
+                sampleClass: DrawTilesTest
             },
             {
                 title: 'Body From Graphic',
