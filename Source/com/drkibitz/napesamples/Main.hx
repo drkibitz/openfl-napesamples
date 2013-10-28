@@ -10,6 +10,7 @@ import flash.display.Sprite;
 import flash.system.System;
 #if mobile
 import flash.display.DisplayObject;
+import flash.events.Event;
 import flash.events.MouseEvent;
 #else
 import flash.events.KeyboardEvent;
@@ -26,6 +27,9 @@ class Main extends Sprite
     private var currentSample:ISample;
     private var sampleDefs:Array<SampleDef>;
     private var sampleDefsIndex:Int = -1;
+    #if mobile
+    private var screenControls:DisplayObject;
+    #end
 
     public function new()
     {
@@ -104,11 +108,13 @@ class Main extends Sprite
         ];
 
         #if mobile
-        var screenControls = new ScreenControls();
+        screenControls = new ScreenControls();
+        screenControls.scaleX = screenControls.scaleY = stage.dpiScale;
         screenControls.x = stage.stageWidth - screenControls.width;
         screenControls.y = stage.stageHeight - screenControls.height;
         stage.addChild(screenControls);
         screenControls.addEventListener(MouseEvent.CLICK, screenControls_onClick);
+        stage.addEventListener(Event.RESIZE, stage_onResize);
         #else
         stage.addEventListener(KeyboardEvent.KEY_DOWN, stage_onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, stage_onKeyUp);
@@ -161,6 +167,12 @@ class Main extends Sprite
                     currentSample.reset();
                 }
         }
+    }
+
+    private function stage_onResize(event:Event):Void
+    {
+        screenControls.x = stage.stageWidth - screenControls.width;
+        screenControls.y = stage.stageHeight - screenControls.height;
     }
     #else
     private function stage_onKeyDown(event:KeyboardEvent):Void

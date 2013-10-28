@@ -147,6 +147,9 @@ class BasicTemplate extends Sprite implements ISample
         textField.selectable = false;
         textField.width = 150;
         textField.height = 800;
+        #if mobile
+        textField.scaleX = textField.scaleY = stage.dpiScale;
+        #end
         if (title != null && title != "") {
             textField.text = "title: " + title;
         }

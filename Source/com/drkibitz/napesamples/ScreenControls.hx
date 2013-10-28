@@ -15,7 +15,7 @@ class ScreenControls extends Sprite
         mouseChildren = true;
 
         graphics.beginFill(0x000000);
-        graphics.drawRect(0, 0, 140, 50);
+        graphics.drawRoundRect(0, 0, 50, 140, 20, 20);
         graphics.endFill();
 
         buttonLeft = new Sprite();
@@ -47,8 +47,8 @@ class ScreenControls extends Sprite
         buttonRight.graphics.lineTo(12, 30);
         buttonRight.graphics.lineTo(12, 10);
         buttonRight.graphics.endFill();
-        buttonRight.x = 50;
-        buttonRight.y = 5;
+        buttonRight.x = 5;
+        buttonRight.y = 50;
         addChild(buttonRight);
 
         buttonReset = new Sprite();
@@ -61,8 +61,8 @@ class ScreenControls extends Sprite
         buttonReset.graphics.beginFill(0xffffff);
         buttonReset.graphics.drawRect(11, 11, 18, 18);
         buttonReset.graphics.endFill();
-        buttonReset.x = 95;
-        buttonReset.y = 5;
+        buttonReset.x = 5;
+        buttonReset.y = 95;
         addChild(buttonReset);
     }
 }
