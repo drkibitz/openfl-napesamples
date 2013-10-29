@@ -27,9 +27,9 @@ import openfl.display.Tilesheet;
 
 class DrawTilesTest extends HandTemplate
 {
-    private static inline var TILE_FIELDS:Int = 4;
-    private static inline var OBJ_SIZE:Int = 48;
+    private static inline var OBJ_SIZE:Int = 46;
     private static inline var SMOOTH:Bool = true;
+    private static inline var TILE_FIELDS:Int = 4;
 
     private var objBitmapData:BitmapData;
     private var drawList:Array<Float>;
@@ -69,6 +69,7 @@ class DrawTilesTest extends HandTemplate
             block.position.y = h - OBJ_SIZE*(pyramidHeight - y + 0.5)*0.99;
             block.shapes.add(new Circle(OBJ_SIZE/2));
             block.space = space;
+            block.debugDraw = false;
         }}
     }
 
