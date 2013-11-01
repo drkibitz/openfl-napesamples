@@ -2,10 +2,10 @@
 <project>
 
     <!-- metadata, make sure 'package' is at least 3 segments (ie. com.mycompany.myproject) -->
-    <meta title="Nape Samples" package="com.drkibitz.napesamples" version="1.0.0" company="Dr. Kibitz" />
+    <meta title="Nape Samples" package="com.drkibitz.napesamples" version="0.0.4" company="Dr. Kibitz" />
 
     <!-- output -->
-    <app file="NapeSamples-0.3" main="com.drkibitz.napesamples.Main" path="Export" />
+    <app file="NapeSamples-0.0.4" main="com.drkibitz.napesamples.Main" path="Export" />
 
     <window fps="60" background="#222222"/>
     <window width="0" height="0" if="html5" />
