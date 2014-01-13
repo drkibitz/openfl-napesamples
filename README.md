@@ -29,3 +29,7 @@ Some samples may be disabled or are slightly modified for performance reasons on
 - OpenFL implementation of BitmapData.perlinNoise does not work
 - OpenFL implementation of BitmapData.draw does not use BlendMode
 - OpenFL implementation of Event.ADDED_TO_STAGE does not fire at appropriate time
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/drkibitz/openfl-napesamples/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
